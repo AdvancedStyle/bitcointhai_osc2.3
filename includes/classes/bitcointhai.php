@@ -7,6 +7,7 @@ class bitcointhaiAPI
 	var $access_id, $access_key;
 	var $api_url = 'http://api.bitcoin.in.th';
 	var $order_id;
+	var $error;
 	public function init($api_id, $api_key){
 		if(strlen($api_id) < 12 || strlen($api_key) < 12){
 			return false;
@@ -21,13 +22,17 @@ class bitcointhaiAPI
 		$params['amount'] = $amount;
 		$params['currency'] = $currency;
 		if($data = $this->apiFetch('validate',$params)){
+			$this->error = $data->errors;
 			return $data->success;
 		}
 	}
 	
-	public function checkorder($order_id){
+	public function checkorder($order_id, $reference_id=''){
 		$params = $this->authParam();
 		$params['order_id'] = $order_id;
+		if($reference_id != ''){
+			$params['reference_id'] = $reference_id;
+		}
 		if($data = $this->apiFetch('checkorder',$params)){
 			return $data;
 		}
@@ -57,25 +62,27 @@ class bitcointhaiAPI
 	}
 	
 	public function countDown($expire,$selector, $text = 'You must send the bitcoins within the next %s Minutes %s Seconds',$expiremsg = 'Bitcoin payment time has expired, please refresh the page to get a new address'){
-		return '<p>'.sprintf($text,'<span id="btcmins">'.$expire.'</span>','<span id="btcsecs">0</span>').'</p><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		return '<p class="bitcoincountdown">'.sprintf($text,'<span id="btcmins">'.$expire.'</span>','<span id="btcsecs">0</span>').'</p><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script>
-		jQuery.noConflict();
-		jQuery(function($){
-			var timer = '.(60*$expire).';
-			function btccountDown(){
-				timer -= 1;
-				var minutes = Math.floor(timer / 60);
-				var seconds = timer - minutes * 60;
-				$("#btcmins").text(minutes);
-				$("#btcsecs").text(seconds);
-				if(timer <= 0){
-					$("#btcmins").closest("'.$selector.'").after("<p>'.$expiremsg.'</p>").remove();
-				}else{
-					setTimeout(btccountDown,1000);
+			if(typeof bitcointhaitimer == \'undefined\'){
+			var bitcointhaitimer = '.(60*$expire).';
+			jQuery.noConflict();
+			jQuery(function($){
+				function btccountDown(){
+					bitcointhaitimer -= 1;
+					var minutes = Math.floor(bitcointhaitimer / 60);
+					var seconds = bitcointhaitimer - minutes * 60;
+					$("#btcmins").text(minutes);
+					$("#btcsecs").text(seconds);
+					if(bitcointhaitimer <= 0){
+						$("#btcmins").closest("'.$selector.'").after("<p>'.$expiremsg.'</p>").remove();
+					}else{
+						setTimeout(btccountDown,1000);
+					}
 				}
+				setTimeout(btccountDown,1000);
+			});
 			}
-			setTimeout(btccountDown,1000);
-		});
 		</script>';
 	}
 	
