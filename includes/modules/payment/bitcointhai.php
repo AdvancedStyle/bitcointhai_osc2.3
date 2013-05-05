@@ -60,14 +60,6 @@
 		}elseif(!$this->api->validate($order->info['total'],$order->info['currency'])){
 			$this->enabled = false;
 		}
-
-
-// disable the module if the order only contains virtual products
-      if ($this->enabled == true) {
-        if ($order->content_type == 'virtual') {
-          $this->enabled = false;
-        }
-      }
     }
 
     function javascript_validation() {
