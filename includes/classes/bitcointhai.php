@@ -88,7 +88,7 @@ class bitcointhaiAPI
 	
 	public function verifyIPN($data){
 		if(!empty($data)){
-			$params = array('hash' => $data['hash'],
+			$params = array('verify' => $data['verify'],
 							'order_id' => $data['order_id']);
 			if($data = $this->apiFetch('verifyipn',$params)){
 				return $data->success;
