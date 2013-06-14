@@ -5,7 +5,7 @@ Bitcoin.in.th API class
 class bitcointhaiAPI
 {
 	var $access_id, $access_key;
-	var $api_url = 'http://api.bitcoin.in.th';
+	var $api_url = 'https://bitcoin.co.th/api/';
 	var $order_id;
 	var $error;
 	public function init($api_id, $api_key){
@@ -99,11 +99,13 @@ class bitcointhaiAPI
 	
 	private function apiFetch($action,$params){
 		if($ch = curl_init ()){
-			curl_setopt ( $ch, CURLOPT_URL, $this->api_url.'?action='.$action);
-			curl_setopt ( $ch, CURLOPT_FOLLOWLOCATION, true );
-			curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
-			curl_setopt ( $ch, CURLOPT_CONNECTTIMEOUT, 5 );
-			curl_setopt ($ch, CURLOPT_POST,count($params));
+			curl_setopt ($ch, CURLOPT_URL, $this->api_url.'?action='.$action);
+			curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true );
+			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1 );
+			curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 5 );
+			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt ($ch, CURLOPT_POST, count($params));
 			curl_setopt ($ch, CURLOPT_POSTFIELDS,$params);
 			
 			$str = curl_exec ( $ch );
